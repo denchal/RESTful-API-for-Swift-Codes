@@ -40,7 +40,8 @@ func Connect() (*sql.DB, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
 	var db *sql.DB
 	var err error
-	for i := 1; i <= 5; i++ {
+	// Try to connect to database 6 times over 30 seconds, else fail
+	for i := 1; i <= 6; i++ {
 		db, err = sql.Open("mysql", dsn)
 		if err == nil {
 			err = db.Ping()
@@ -50,8 +51,8 @@ func Connect() (*sql.DB, error) {
 			}
 		}
 
-		log.Printf("Cannot connect to database, try %d/5: Waiting for database...", i)
-		time.Sleep(1*time.Second)
+		log.Printf("Cannot connect to database, try %d/6: Waiting for database...", i)
+		time.Sleep(5*time.Second)
 	}
 
 	if err := db.Ping(); err != nil {
