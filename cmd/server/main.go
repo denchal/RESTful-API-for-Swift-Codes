@@ -62,7 +62,7 @@ func main() {
 	}
 	err = parser.Parse(db)
 	if err != nil {
-		log.Println(err) // It's normal to get an error here since data might be already parsed
+		log.Println(err) // It's normal to get errors here since some data might be already parsed
 	}
 
 	router := gin.Default()

@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
+	"log"
 	"os"
 	"strings"
-	"path/filepath"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 )
 
 type Record struct {
@@ -31,9 +31,7 @@ type CountryRecord struct {
 // Both parse and insert data into database
 func Parse(db *sql.DB) error {
 	// Open and parse CSV file
-	dir, _ := os.Getwd()
-	filePath := filepath.Join(dir, "internal/data/SWIFT_CODES.csv")
-	parsedRecords, err := ParseCSV(filePath)
+	parsedRecords, err := ParseCSV("../../internal/data/SWIFT_CODES.csv")
 	if err != nil {
 		fmt.Printf("Failed to parseCSV: %v\n", err)
 		return err
@@ -102,7 +100,11 @@ func InsertCountries(db *sql.DB, records []Record) error {
 
 	for _, country := range countrySet {
 		if err := insertCountry(db, country); err != nil {
-			return fmt.Errorf("failed to insert country %v: %w", country.COUNTRY_NAME, err)
+			if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1062 {
+				log.Print("Duplicate entry, ignoring error.")
+			} else {
+				log.Fatalf("Database error: %v", err)
+			}
 		}
 	}
 	return nil
@@ -111,7 +113,11 @@ func InsertCountries(db *sql.DB, records []Record) error {
 func InsertBranches(db *sql.DB, records []Record) error {
 	for _, record := range records {
 		if err := insertRecord(db, record); err != nil {
-			return fmt.Errorf("failed to insert branch %v: %w", record.SWIFT_CODE, err)
+			if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1062 {
+				log.Print("Duplicate entry, ignoring error.")
+			} else {
+				log.Fatalf("Database error: %v", err)
+			}
 		}
 	}
 	return nil
