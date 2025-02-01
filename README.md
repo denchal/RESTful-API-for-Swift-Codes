@@ -132,13 +132,14 @@ This project is a RESTful API built using Go and the Gin framework for managing 
 ## Alternative Setup using Docker:
 **Run using Docker Compose:**
    - Ensure Docker and Docker Compose are installed.
-   - Edit ```Dockerfile``` and ```docker-compose.yaml```, otherwise app will run on ```localhost:8080```
+   - Edit ```Dockerfile``` and ```docker-compose.yaml``` to match database needs.
    - Start the application using:
      ```sh
      docker-compose up --build
      ```
      
-**Warning: First run takes longer due to parsing of the entire CSV file, as I did not include all data inside the init.sql file!**
+**Warning: First run takes longer due to parsing of the entire CSV file, as I did not include all data inside the init.sql file!** <br>
+**App is hardcoded to run on ```localhost:8080```!**
 
 ## Database Schema
 ### `branches` Table
